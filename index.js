@@ -1,7 +1,26 @@
 const fetch = require('cross-fetch')
 const username = ''
 const password = ''
+const nodeMailer = require("nodemailer")
+const smtpTransport = require("nodemailer-smtp-transport")
+let transporter = nodeMailer.createTransport(
+  smtpTransport({
+    service: "gmail",
+    auth: {
+      user: "elderlycare.hcmus@gmail.com",
+      pass: "doantn2019"
+    }
+  })
+)
+let mailOptions = {
+  from: "elderlycare.hcmus@gmail.com",
+  to: "phanduchupdkh@gmail.com",
+  subject: `Đặt cơm ${new Date().toISOString()}`,
+  html: ""
+}
+
 // login
+
 fetch("https://portal.acexis.com/graphqllunch",
   {
     "credentials": "omit",
@@ -46,20 +65,20 @@ fetch("https://portal.acexis.com/graphqllunch",
       .then(res => res.json())
       .then(res => {
         let { dishes } = res.data.menuPublishBySite
-        
+
         const monUaThich = ['cá lóc', 'gà kho', 'canh chua']
         let dish;
-        monUaThich.forEach(mon=>{
-          if(!dish){
-            dish = dishes.find(item=>item.name.toLowerCase().includes(mon))
+        monUaThich.forEach(mon => {
+          if (!dish) {
+            dish = dishes.find(item => item.name.toLowerCase().includes(mon))
           }
         })
-        if(!dish){dish = dishes[0]}
-        let {_id } = res.data.menuPublishBySite
-        return { dish, _id}
+        if (!dish) { dish = dishes[0] }
+        let { _id } = res.data.menuPublishBySite
+        return { dish, _id }
 
       })
-      .then(({dish, _id }) => {
+      .then(({ dish, _id }) => {
         // check should order
         fetch("https://portal.acexis.com/graphqllunch",
           {
@@ -73,7 +92,21 @@ fetch("https://portal.acexis.com/graphqllunch",
           })
           .then(res => res.json())
           .then(res => {
-            if (res.data.ordersByUser.length) { console.log('bạn đã đặt rồi :', res.data.ordersByUser) }
+            if (res.data.ordersByUser.length) {
+              let html = `
+                    <h3>Ban da dat roi<h3>
+                  `
+              mailOptions.html = html
+              transporter.sendMail(mailOptions, function (err) {
+                if (err) {
+                  console.log("Sending to failed: " + err)
+                } else {
+                  console.log("Sent to PXD")
+                  // callback()
+                }
+              })
+              console.log('bạn đã đặt rồi :', res.data.ordersByUser)
+            }
             else {
               // oder
               fetch("https://portal.acexis.com/graphqllunch",
@@ -88,6 +121,18 @@ fetch("https://portal.acexis.com/graphqllunch",
                 })
                 .then(res => {
                   console.log(`ban da dat mon: ${dish.name} thanh cong`)
+                  let html = `
+                    <h3>Dat mon ${dish.name} Thanh cong<h3>
+                  `
+                  mailOptions.html = html
+                  transporter.sendMail(mailOptions, function (err) {
+                    if (err) {
+                      console.log("Sending to failed: " + err)
+                    } else {
+                      console.log("Sent to PXD")
+                      // callback()
+                    }
+                  })
                 })
             }
           })
