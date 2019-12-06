@@ -3,6 +3,12 @@ const username = ''
 const password = ''
 const nodeMailer = require("nodemailer")
 const smtpTransport = require("nodemailer-smtp-transport")
+
+const { TelegramClient } = require('messaging-api-telegram');
+// get accessToken from telegram [@BotFather](https://telegram.me/BotFather)
+const client = TelegramClient.connect('972402414:AAE5rvRgp3oanR7tRm7mO2YESRrpE4bya-Q');
+
+
 let transporter = nodeMailer.createTransport(
   smtpTransport({
     service: "gmail",
@@ -66,7 +72,7 @@ fetch("https://portal.acexis.com/graphqllunch",
       .then(res => {
         let { dishes } = res.data.menuPublishBySite
 
-        const monUaThich = ['cá lóc', 'gà kho', 'canh chua']
+        const monUaThich = ['cá lóc', 'gà kho', 'canh chua', 'ba rọi kho tiêu', 'canh khổ qua', 'ếch xào cà ri', 'bò xào', 'mực xào cà ri', ]
         let dish;
         monUaThich.forEach(mon => {
           if (!dish) {
@@ -93,18 +99,11 @@ fetch("https://portal.acexis.com/graphqllunch",
           .then(res => res.json())
           .then(res => {
             if (res.data.ordersByUser.length) {
-              let html = `
-                    <h3>Ban da dat roi<h3>
-                  `
-              mailOptions.html = html
-              transporter.sendMail(mailOptions, function (err) {
-                if (err) {
-                  console.log("Sending to failed: " + err)
-                } else {
-                  console.log("Sent to PXD")
-                  // callback()
-                }
-              })
+
+              client.sendMessage(-339081841, 'Đã đặt cơm rồi @phanduchupdkh nên không đặt thêm được nữa ').then(() => {
+                console.log('sent');
+              });
+
               console.log('bạn đã đặt rồi :', res.data.ordersByUser)
             }
             else {
