@@ -1,10 +1,16 @@
 const fetch = require('cross-fetch')
+const axios = require('axios')
+const { TelegramClient } = require('messaging-api-telegram')
 const username = 'xuanduc'
 const password = '12345678'
 
-const { TelegramClient } = require('messaging-api-telegram')
 // get accessToken from telegram [@BotFather](https://telegram.me/BotFather)
 const client = TelegramClient.connect('972402414:AAE5rvRgp3oanR7tRm7mO2YESRrpE4bya-Q')
+
+
+axios.get("https://github.com/phanduchupdkh/lenhDatComTrua/blob/master/monkhonguathich.txt")
+.then(res=>res.data.split('trunhungmonnayra:')[1])
+.then(res=>console.log(res))
 
 // login
 
@@ -59,7 +65,6 @@ fetch("https://portal.acexis.com/graphqllunch",
           dishes = dishes.filter(item => !(item.name.toLowerCase().includes(monKhongUa)))
         })
 
-        console.log(dishes)
         monUaThich.forEach(mon => {
           if (!dish) {
             dish = dishes.find(item => item.name.toLowerCase().includes(mon))
@@ -86,7 +91,10 @@ fetch("https://portal.acexis.com/graphqllunch",
           .then(res => {
             if (res.data.ordersByUser.length) {
 
-              console.log('bạn đã đặt rồi :', res.data.ordersByUser)
+              // console.log('bạn đã đặt rồi :', res.data.ordersByUser)
+		        client.sendMessage(-339081841, `@phanduchupdkh ban da dat truoc do roi `).then(() => {
+               console.log('sent');
+                  });
             }
             else {
               // oder
