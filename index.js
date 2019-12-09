@@ -1,16 +1,10 @@
 const fetch = require('cross-fetch')
-const axios = require('axios')
-const { TelegramClient } = require('messaging-api-telegram')
 const username = 'xuanduc'
 const password = '12345678'
 
+const { TelegramClient } = require('messaging-api-telegram')
 // get accessToken from telegram [@BotFather](https://telegram.me/BotFather)
 const client = TelegramClient.connect('972402414:AAE5rvRgp3oanR7tRm7mO2YESRrpE4bya-Q')
-
-
-axios.get("https://github.com/phanduchupdkh/lenhDatComTrua/blob/master/monkhonguathich.txt")
-.then(res=>res.data.split('trunhungmonnayra:')[1])
-.then(res=>console.log(res))
 
 // login
 
@@ -58,19 +52,30 @@ fetch("https://portal.acexis.com/graphqllunch",
       .then(res => res.json())
       .then(res => {
         let { dishes } = res.data.menuPublishBySite
-        const monKhongUas = ['chiên', 'chay']
-        const monUaThich = ['cá lóc', 'gà kho', 'canh chua', 'ba rọi kho tiêu', 'canh khổ qua', 'ếch xào cà ri', 'bò xào', 'mực xào cà ri',]
+        const monKhongUas = ['chiên', 'chay', 'gỏi cuốn']
+        const monUaThichDraf = ['cá lóc', 'gà kho', 'canh chua', 'ba rọi kho tiêu', 'canh khổ qua', 'ếch xào', 'bò xào', 'mực xào cà ri']
+        let obj = {}, len = monUaThichDraf.length, count = 0
+        let monUaThich = []
+        while (count < len) {
+          let random = monUaThichDraf[parseInt(Math.random() * len)]
+          if (!obj[random]) {
+            obj[random] = 1
+            monUaThich.push(random)
+            count++
+          }
+        }
+        // console.log(monUaThich)
         let dish;
         monKhongUas.forEach(monKhongUa => {
           dishes = dishes.filter(item => !(item.name.toLowerCase().includes(monKhongUa)))
         })
-
+        console.log(dishes.map(d => d.name))
         monUaThich.forEach(mon => {
           if (!dish) {
             dish = dishes.find(item => item.name.toLowerCase().includes(mon))
           }
         })
-        if (!dish) { dish = dishes[0] }
+        if (!dish) { dish = dishes[parseInt(dishes.length * Math.random())] }
         let { _id } = res.data.menuPublishBySite
         return { dish, _id }
 
@@ -91,10 +96,19 @@ fetch("https://portal.acexis.com/graphqllunch",
           .then(res => {
             if (res.data.ordersByUser.length) {
 
-              // console.log('bạn đã đặt rồi :', res.data.ordersByUser)
-		        client.sendMessage(-339081841, `@phanduchupdkh ban da dat truoc do roi `).then(() => {
-               console.log('sent');
-                  });
+              console.log('bạn đã đặt rồi :', res.data.ordersByUser)
+              // ham  confirm
+              let idConfirm = res.data.ordersByUser[0]._id
+              fetch("https://portal.acexis.com/graphqllunch", {
+                "credentials": "omit",
+                "headers": header,
+                "referrer": "https://portal.acexis.com/lun/order",
+                "referrerPolicy": "no-referrer-when-downgrade",
+                "body": `{\"operationName\":\"updateOrder\",\"variables\":{\"id\":\"${idConfirm}\",\"input\":{\"isConfirmed\":true}},\"query\":\"mutation updateOrder($id: String!, $input: UpdateOrderInputC!) {\\n  updateOrder(id: $id, input: $input)\\n}\\n\"}`,
+                "method": "POST",
+                "mode": "cors"
+              })
+              .then(()=>console.log('confirm thanh cong'))
             }
             else {
               // oder
@@ -142,3 +156,4 @@ fetch("https://portal.acexis.com/graphqllunch",
 //   "body": "{\"operationName\":\"orderDishC\",\"variables\":{\"input\":{\"menuId\":\"b61d9d32-172e-11ea-9545-9ff408c0ec7e\",\"dishId\":\"e87b2360-172e-11ea-9545-9ff408c0ec7e\",\"order\":false}},\"query\":\"mutation orderDishC($input: CreateOrderInputC!) {\\n  orderDishC(input: $input)\\n}\\n\"}",
 //   "method": "POST", "mode": "cors"
 // });
+
