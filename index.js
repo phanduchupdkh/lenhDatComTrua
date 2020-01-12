@@ -1,5 +1,5 @@
 const fetch = require('cross-fetch')
-const username = 'xuanduc'
+const username = 'duc.phan'
 const password = '12345678'
 
 const { TelegramClient } = require('messaging-api-telegram')
@@ -18,7 +18,7 @@ fetch("https://portal.acexis.com/graphqllunch",
       "currentsite": "",
       "sec-fetch-mode": "cors",
       "sec-fetch-site": "same-origin",
-      "token": ""
+      "access-token": ""
     },
     "referrer": "https://portal.acexis.com/lun/login",
     "referrerPolicy": "no-referrer-when-downgrade",
