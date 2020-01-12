@@ -1,10 +1,12 @@
 const fetch = require('cross-fetch')
+const axios = require('axios')
+const { TelegramClient } = require('messaging-api-telegram')
 const username = 'duc.phan'
 const password = '12345678'
 
-const { TelegramClient } = require('messaging-api-telegram')
 // get accessToken from telegram [@BotFather](https://telegram.me/BotFather)
 const client = TelegramClient.connect('972402414:AAE5rvRgp3oanR7tRm7mO2YESRrpE4bya-Q')
+
 
 // login
 
@@ -36,7 +38,7 @@ fetch("https://portal.acexis.com/graphqllunch",
       "currentsite": "52be5550-be4f-11e9-aa89-2b0626c97f03",
       "sec-fetch-mode": "cors",
       "sec-fetch-site": "same-origin",
-      "token": tokenD
+      "access-token": tokenD
     }
 
     // getMenu
@@ -50,38 +52,26 @@ fetch("https://portal.acexis.com/graphqllunch",
       "mode": "cors"
     })
       .then(res => res.json())
-      .then(res => {
+      .then(async res => {
         let { dishes } = res.data.menuPublishBySite
-        const monKhongUas = ['chiên', 'chay', 'gỏi cuốn']
-        const monUaThichDraf = ['cá lóc', 'gà kho', 'canh chua', 'ba rọi kho tiêu', 'canh khổ qua', 'ếch xào', 'bò xào', 'mực xào cà ri']
-        let obj = {}, len = monUaThichDraf.length, count = 0
-        let monUaThich = []
-        while (count < len) {
-          let random = monUaThichDraf[parseInt(Math.random() * len)]
-          if (!obj[random]) {
-            obj[random] = 1
-            monUaThich.push(random)
-            count++
-          }
-        }
-        // console.log(monUaThich)
+	let duPhong = dishes[0]
+        let monKhongUas = await axios.get("https://github.com/phanduchupdkh/lenhDatComTrua/blob/master/monkhonguathich.txt")
+	monKhongUas = monKhongUas.data.split('trunhungmonnayra:')[1].split(/,\s?/)
         let dish;
         monKhongUas.forEach(monKhongUa => {
           dishes = dishes.filter(item => !(item.name.toLowerCase().includes(monKhongUa)))
         })
-        console.log(dishes.map(d => d.name))
-        monUaThich.forEach(mon => {
-          if (!dish) {
-            dish = dishes.find(item => item.name.toLowerCase().includes(mon))
-          }
-        })
-        if (!dish) { dish = dishes[parseInt(dishes.length * Math.random())] }
+
+	const lenDish = dishes.length
+	//console.log(dishes.map(item=>item.name))
+        lenDish?(dish = dishes[parseInt(lenDish*Math.random())]):(dish = duPhong)
+	
         let { _id } = res.data.menuPublishBySite
         return { dish, _id }
-
       })
       .then(({ dish, _id }) => {
         // check should order
+	//console.log(dish.name)
         fetch("https://portal.acexis.com/graphqllunch",
           {
             "credentials": "omit",
@@ -96,19 +86,24 @@ fetch("https://portal.acexis.com/graphqllunch",
           .then(res => {
             if (res.data.ordersByUser.length) {
 
-              console.log('bạn đã đặt rồi :', res.data.ordersByUser)
-              // ham  confirm
-              let idConfirm = res.data.ordersByUser[0]._id
-              fetch("https://portal.acexis.com/graphqllunch", {
-                "credentials": "omit",
-                "headers": header,
-                "referrer": "https://portal.acexis.com/lun/order",
-                "referrerPolicy": "no-referrer-when-downgrade",
-                "body": `{\"operationName\":\"updateOrder\",\"variables\":{\"id\":\"${idConfirm}\",\"input\":{\"isConfirmed\":true}},\"query\":\"mutation updateOrder($id: String!, $input: UpdateOrderInputC!) {\\n  updateOrder(id: $id, input: $input)\\n}\\n\"}`,
-                "method": "POST",
-                "mode": "cors"
-              })
-              .then(()=>console.log('confirm thanh cong'))
+              // console.log('bạn đã đặt rồi :', res.data.ordersByUser)
+	      let idConfirm = res.data.ordersByUser[0]._id
+		if(res.data.ordersByUser[0].isConfirmed===false){
+             		 fetch("https://portal.acexis.com/graphqllunch", {
+                	"credentials": "omit",
+                	"headers": header,
+                	"referrer": "https://portal.acexis.com/lun/order",
+                	"referrerPolicy": "no-referrer-when-downgrade",
+               	 	"body": `{\"operationName\":\"updateOrder\",\"variables\":{\"id\":\"${idConfirm}\",\"input\":{\"isConfirmed\":true}},\"query\":\"mutation updateOrder($id: String!, $input: UpdateOrderInputC!) {\\n  updateOrder(id: $id, input: $input)\\n}\\n\"}`,
+                	"method": "POST",
+               	 	"mode": "cors"
+              		})
+              		.then(()=>{
+				client.sendMessage(-339081841, `@phanduchupdkh ban da confirm thanh cong`).then(() => {
+                    		console.log('sent');
+                  		});
+			})
+		}
             }
             else {
               // oder
@@ -156,4 +151,3 @@ fetch("https://portal.acexis.com/graphqllunch",
 //   "body": "{\"operationName\":\"orderDishC\",\"variables\":{\"input\":{\"menuId\":\"b61d9d32-172e-11ea-9545-9ff408c0ec7e\",\"dishId\":\"e87b2360-172e-11ea-9545-9ff408c0ec7e\",\"order\":false}},\"query\":\"mutation orderDishC($input: CreateOrderInputC!) {\\n  orderDishC(input: $input)\\n}\\n\"}",
 //   "method": "POST", "mode": "cors"
 // });
-
