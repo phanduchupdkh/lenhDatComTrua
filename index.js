@@ -54,24 +54,28 @@ fetch("https://portal.acexis.com/graphqllunch",
       .then(res => res.json())
       .then(async res => {
         let { dishes } = res.data.menuPublishBySite
-	let duPhong = dishes[0]
+        let duPhong = dishes[0]
         let monKhongUas = await axios.get("https://github.com/phanduchupdkh/lenhDatComTrua/blob/master/monkhonguathich.txt")
-	monKhongUas = monKhongUas.data.split('trunhungmonnayra:')[1].split(/,\s?/)
+        monKhongUas = monKhongUas.data.split('trunhungmonnayra:')[1].split(/,\s?/)
         let dish;
         monKhongUas.forEach(monKhongUa => {
           dishes = dishes.filter(item => !(item.name.toLowerCase().includes(monKhongUa)))
         })
 
-	const lenDish = dishes.length
-	//console.log(dishes.map(item=>item.name))
-        lenDish?(dish = dishes[parseInt(lenDish*Math.random())]):(dish = duPhong)
-	
+        const lenDish = dishes.length
+        //console.log(dishes.map(item=>item.name))
+        if (lenDish) {
+          dish = dishes[parseInt(lenDish * Math.random())]
+        } else {
+          dish = duPhong
+        }
+
         let { _id } = res.data.menuPublishBySite
         return { dish, _id }
       })
       .then(({ dish, _id }) => {
         // check should order
-	//console.log(dish.name)
+        console.log(dish.name)
         fetch("https://portal.acexis.com/graphqllunch",
           {
             "credentials": "omit",
@@ -86,39 +90,45 @@ fetch("https://portal.acexis.com/graphqllunch",
           .then(res => {
             if (res.data.ordersByUser.length) {
 
-              // console.log('bạn đã đặt rồi :', res.data.ordersByUser)
-	      let idConfirm = res.data.ordersByUser[0]._id
-		if(res.data.ordersByUser[0].isConfirmed===false){
-             		 fetch("https://portal.acexis.com/graphqllunch", {
-                	"credentials": "omit",
-                	"headers": header,
-                	"referrer": "https://portal.acexis.com/lun/order",
-                	"referrerPolicy": "no-referrer-when-downgrade",
-               	 	"body": `{\"operationName\":\"updateOrder\",\"variables\":{\"id\":\"${idConfirm}\",\"input\":{\"isConfirmed\":true}},\"query\":\"mutation updateOrder($id: String!, $input: UpdateOrderInputC!) {\\n  updateOrder(id: $id, input: $input)\\n}\\n\"}`,
-                	"method": "POST",
-               	 	"mode": "cors"
-              		})
-              		.then(()=>{
-				client.sendMessage(-339081841, `@phanduchupdkh ban da confirm thanh cong`).then(() => {
-                    		console.log('sent');
-                  		});
-			})
-		}
-            }
-            else {
-              // oder
-              fetch("https://portal.acexis.com/graphqllunch",
-                {
+              let idConfirm = res.data.ordersByUser[0]._id
+              if (res.data.ordersByUser[0].isConfirmed === false) {
+                fetch("https://portal.acexis.com/graphqllunch", {
                   "credentials": "omit",
                   "headers": header,
                   "referrer": "https://portal.acexis.com/lun/order",
                   "referrerPolicy": "no-referrer-when-downgrade",
-                  "body": `{\"operationName\":\"orderDishC\",\"variables\":{\"input\":{\"menuId\":\"${_id}\",\"dishId\":\"${dish._id}\",\"order\":true}},\"query\":\"mutation orderDishC($input: CreateOrderInputC!) {\\n  orderDishC(input: $input)\\n}\\n\"}`,
+                  "body": `{\"operationName\":\"updateOrder\",\"variables\":{\"id\":\"${idConfirm}\",\"input\":{\"isConfirmed\":true}},\"query\":\"mutation updateOrder($id: String!, $input: UpdateOrderInputC!) {\\n  updateOrder(id: $id, input: $input)\\n}\\n\"}`,
                   "method": "POST",
                   "mode": "cors"
                 })
+                  .then((res) => {
+                    console.log(res)
+                    client.sendMessage(-339081841, `@phanduchupdkh ban da confirm thanh cong`).then(() => {
+                      console.log('sent');
+                    });
+                  })
+              }
+            }
+            else {
+              // oder
+              console.log(header)
+              fetch("https://portal.acexis.com/graphqllunch",
+                {
+                  "credentials": "omit",
+                  "headers": {
+                    "accept": "*/*", "accept-language": "en-US,en;q=0.9",
+                    "access-token": tokenD,
+                    "content-type": "application/json",
+                    "current-site": "52be5550-be4f-11e9-aa89-2b0626c97f03",
+                    "sec-fetch-mode": "cors", "sec-fetch-site": "same-origin"
+                  },
+                  "referrer": "https://portal.acexis.com/lun/order",
+                  "referrerPolicy": "no-referrer-when-downgrade",
+                  "body": `{\"operationName\":\"orderDishC\",\"variables\":{\"input\":{\"menuId\":\"${_id}\",\"dishId\":\"${dish._id}\",\"order\":true}},\"query\":\"mutation orderDishC($input: CreateOrderInputC!) {\\n  orderDishC(input: $input)\\n}\\n\"}`,
+                  "method": "POST", "mode": "cors"
+                })
                 .then(res => {
-                  console.log(`ban da dat mon: ${dish.name} thanh cong`)
+                  console.log(res)
                   client.sendMessage(-339081841, `@phanduchupdkh ban da dat mon: ${dish.name} thanh cong `).then(() => {
                     console.log('sent');
                   });
@@ -130,9 +140,7 @@ fetch("https://portal.acexis.com/graphqllunch",
       .catch(err => {
         console.log(err)
       })
-
   })
-
 
 // Ham huy 
 // fetch("https://portal.acexis.com/graphqllunch", {
