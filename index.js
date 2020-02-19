@@ -142,20 +142,5 @@ fetch("https://portal.acexis.com/graphqllunch",
       })
   })
 
-// Ham huy 
-// fetch("https://portal.acexis.com/graphqllunch", {
-//   "credentials": "omit",
-//   "headers": {
-//     "accept": "*/*",
-//     "accept-language": "en-US,en;q=0.9",
-//     "content-type": "application/json",
-//     "currentsite": "52be5550-be4f-11e9-aa89-2b0626c97f03",
-//     "sec-fetch-mode": "cors",
-//     "sec-fetch-site": "same-origin",
-//     "token": "erQaAqcaD_XCMcBQRnfT3OW18"
-//   },
-//   "referrer": "https://portal.acexis.com/lun/order",
-//   "referrerPolicy": "no-referrer-when-downgrade",
-//   "body": "{\"operationName\":\"orderDishC\",\"variables\":{\"input\":{\"menuId\":\"b61d9d32-172e-11ea-9545-9ff408c0ec7e\",\"dishId\":\"e87b2360-172e-11ea-9545-9ff408c0ec7e\",\"order\":false}},\"query\":\"mutation orderDishC($input: CreateOrderInputC!) {\\n  orderDishC(input: $input)\\n}\\n\"}",
-//   "method": "POST", "mode": "cors"
-// });
+// ham confirm2
+//fetch("https://portal.acexis.com/graphqllunch", {"credentials":"omit","headers":{"accept":"*/*","accept-language":"en-US,en;q=0.9","access-token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3N1ZXIiOiJodHRwOi8vY2huaXJ0LmdpdGh1Yi5pbyIsInN1YmplY3QiOiIyZjQ3MTJjMi1kZTgzLTE4MTQtNmU3YS05OWVkYmVmYzYyODciLCJpYXQiOjE1ODE5MTczOTIsImV4cCI6MTU4NDUwOTM5Mn0.GP6N5Ba7V1elhpUHc5IriWdzsq_wvCCqnwsX_ItzoDc","content-type":"application/json","current-site":"52be5550-be4f-11e9-aa89-2b0626c97f03","sec-fetch-mode":"cors","sec-fetch-site":"same-origin"},"referrer":"https://portal.acexis.com/lun/order","referrerPolicy":"no-referrer-when-downgrade","body":"{\"operationName\":\"updateOrder\",\"variables\":{\"currentSite\":\"52be5550-be4f-11e9-aa89-2b0626c97f03\",\"id\":\"08a06400-5228-11ea-abc7-290ee513798d\",\"input\":{\"isConfirmed\":true}},\"query\":\"mutation updateOrder($id: String!, $input: UpdateOrderInputC!, $currentSite: String!) {\\n  updateOrder2(id: $id, input: $input, currentSite: $currentSite)\\n}\\n\"}","method":"POST","mode":"cors"});
