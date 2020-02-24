@@ -2,7 +2,7 @@ const fetch = require('cross-fetch')
 const axios = require('axios')
 const { TelegramClient } = require('messaging-api-telegram')
 const username = 'duc.phan'
-const password = '12345678'
+const password = '1234567'
 
 // get accessToken from telegram [@BotFather](https://telegram.me/BotFather)
 const client = TelegramClient.connect('972402414:AAE5rvRgp3oanR7tRm7mO2YESRrpE4bya-Q')
@@ -93,20 +93,20 @@ fetch("https://portal.acexis.com/graphqllunch",
               let idConfirm = res.data.ordersByUser[0]._id
               if (res.data.ordersByUser[0].isConfirmed === false) {
                 fetch("https://portal.acexis.com/graphqllunch", {
-                  "credentials": "omit",
-                  "headers": header,
-                  "referrer": "https://portal.acexis.com/lun/order",
-                  "referrerPolicy": "no-referrer-when-downgrade",
-                  "body": `{\"operationName\":\"updateOrder\",\"variables\":{\"id\":\"${idConfirm}\",\"input\":{\"isConfirmed\":true}},\"query\":\"mutation updateOrder($id: String!, $input: UpdateOrderInputC!) {\\n  updateOrder(id: $id, input: $input)\\n}\\n\"}`,
-                  "method": "POST",
-                  "mode": "cors"
+                  "credentials":"omit",
+                  "headers":header,
+                  "referrer":"https://portal.acexis.com/lun/order",
+                  "referrerPolicy":"no-referrer-when-downgrade",
+                  "body":`{\"operationName\":\"updateOrder\",\"variables\":{\"currentSite\":\"52be5550-be4f-11e9-aa89-2b0626c97f03\",\"id\":\"${idConfirm}\",\"input\":{\"isConfirmed\":true}},\"query\":\"mutation updateOrder($id: String!, $input: UpdateOrderInputC!, $currentSite: String!) {\\n  updateOrder2(id: $id, input: $input, currentSite: $currentSite)\\n}\\n\"}`,
+                  "method":"POST",
+                  "mode":"cors"
                 })
-                  .then((res) => {
-                    console.log(res)
-                    client.sendMessage(-339081841, `@phanduchupdkh ban da confirm thanh cong`).then(() => {
-                      console.log('sent');
-                    });
-                  })
+                .then((res) => {
+                  console.log(res)
+                  client.sendMessage(-339081841, `@phanduchupdkh ban da confirm thanh cong`).then(() => {
+                    console.log('sent');
+                  });
+                })
               }
             }
             else {
@@ -141,6 +141,3 @@ fetch("https://portal.acexis.com/graphqllunch",
         console.log(err)
       })
   })
-
-// ham confirm2
-//fetch("https://portal.acexis.com/graphqllunch", {"credentials":"omit","headers":{"accept":"*/*","accept-language":"en-US,en;q=0.9","access-token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3N1ZXIiOiJodHRwOi8vY2huaXJ0LmdpdGh1Yi5pbyIsInN1YmplY3QiOiIyZjQ3MTJjMi1kZTgzLTE4MTQtNmU3YS05OWVkYmVmYzYyODciLCJpYXQiOjE1ODE5MTczOTIsImV4cCI6MTU4NDUwOTM5Mn0.GP6N5Ba7V1elhpUHc5IriWdzsq_wvCCqnwsX_ItzoDc","content-type":"application/json","current-site":"52be5550-be4f-11e9-aa89-2b0626c97f03","sec-fetch-mode":"cors","sec-fetch-site":"same-origin"},"referrer":"https://portal.acexis.com/lun/order","referrerPolicy":"no-referrer-when-downgrade","body":"{\"operationName\":\"updateOrder\",\"variables\":{\"currentSite\":\"52be5550-be4f-11e9-aa89-2b0626c97f03\",\"id\":\"08a06400-5228-11ea-abc7-290ee513798d\",\"input\":{\"isConfirmed\":true}},\"query\":\"mutation updateOrder($id: String!, $input: UpdateOrderInputC!, $currentSite: String!) {\\n  updateOrder2(id: $id, input: $input, currentSite: $currentSite)\\n}\\n\"}","method":"POST","mode":"cors"});
